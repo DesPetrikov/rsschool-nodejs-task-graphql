@@ -62,14 +62,31 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         reply.statusCode = 400;
         throw new Error('Invalid id');
       }
-      const subscriptions = await this.db.users.findMany({ key: 'subscribedToUserIds', inArray: request.params.id });
-      for(let i = 0; i< subscriptions.length; i++) {
-        await this.db.users.change(subscriptions[i].id, {subscribedToUserIds: subscriptions[i].subscribedToUserIds.filter(id => id !== request.params.id)})
+      const subscriptions = await this.db.users.findMany({
+        key: 'subscribedToUserIds',
+        inArray: request.params.id,
+      });
+      for (let i = 0; i < subscriptions.length; i++) {
+        await this.db.users.change(subscriptions[i].id, {
+          subscribedToUserIds: subscriptions[i].subscribedToUserIds.filter(
+            (id) => id !== request.params.id
+          ),
+        });
       }
-      const userPosts = await this.db.posts.findMany({key: 'userId', equals: request.params.id})
-      for(let i = 0; i < userPosts.length; i++) {
-        await this.db.posts.delete(userPosts[i].id)
+      const userPosts = await this.db.posts.findMany({
+        key: 'userId',
+        equals: request.params.id,
+      });
+      for (let i = 0; i < userPosts.length; i++) {
+        await this.db.posts.delete(userPosts[i].id);
       }
+
+      const userProfile = await this.db.profiles.findOne({
+        key: 'userId',
+        equals: request.params.id,
+      });
+      userProfile && await this.db.profiles.delete(userProfile.id);
+      
       await this.db.users.delete(request.params.id);
       return deletedUser;
     }
@@ -139,7 +156,9 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       );
       if (subscriberIdx !== -1) {
         return await this.db.users.change(subscriptionKeeper.id, {
-          subscribedToUserIds: subscriptionKeeper.subscribedToUserIds.filter(id => id !== request.params.id)
+          subscribedToUserIds: subscriptionKeeper.subscribedToUserIds.filter(
+            (id) => id !== request.params.id
+          ),
         });
       } else {
         reply.statusCode = 400;
