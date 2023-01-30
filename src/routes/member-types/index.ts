@@ -9,7 +9,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify.get('/', async function (request, reply): Promise<
     MemberTypeEntity[]
   > {
-    return await this.db.memberTypes.findMany()
+    return await this.db.memberTypes.findMany();
   });
 
   fastify.get(
@@ -25,8 +25,9 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.params.id,
       });
       if (!type) {
-        reply.statusCode = 404;
-        throw new Error('Invalid id');
+        throw this.httpErrors.notFound(
+          `Member Type with id - ${request.params.id} was not found`
+        );
       }
       return type;
     }
@@ -46,8 +47,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.params.id,
       });
       if (!memberType) {
-        reply.statusCode = 400;
-        throw new Error('Invalid id');
+        throw this.httpErrors.badRequest('Invalid id');
       }
       return await this.db.memberTypes.change(request.params.id, request.body);
     }

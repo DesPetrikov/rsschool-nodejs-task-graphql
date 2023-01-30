@@ -67,8 +67,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.params.id,
       });
       if (!deletedProfile) {
-        reply.statusCode = 400;
-        throw new Error('Invalid id');
+      throw fastify.httpErrors.badRequest('Invalid id')
       }
       await this.db.profiles.delete(request.params.id);
       return deletedProfile;
