@@ -3,7 +3,13 @@ import { graphql } from 'graphql/graphql';
 import { GraphQLList, GraphQLObjectType, GraphQLSchema } from 'graphql/type';
 import { GraphQLID } from 'graphql/type/scalars';
 import { graphqlBodySchema } from './schema';
-import { MemberTypeType, PostType, ProfileType, UserType } from './types';
+import {
+  AllInformationAboutUserType,
+  MemberTypeType,
+  PostType,
+  ProfileType,
+  UserType,
+} from './types';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -86,7 +92,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
                 type: GraphQLID,
               },
             },
-            resolve: async(parent, args) => {
+            resolve: async (parent, args) => {
               const type = await this.db.memberTypes.findOne({
                 key: 'id',
                 equals: args.memberTypeId,
@@ -97,7 +103,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
                 );
               }
               return type;
-            }
+            },
           },
           profiles: {
             type: new GraphQLList(ProfileType),
@@ -118,11 +124,43 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
                 equals: args.profileId,
               });
               if (!profile) {
-                throw this.httpErrors.notFound(`Profile with id - ${args.profileId} not found`)
+                throw this.httpErrors.notFound(
+                  `Profile with id - ${args.profileId} not found`
+                );
               }
               return profile;
-            }
-          }
+            },
+          },
+          allInformationAboutUsers: {
+            type: new GraphQLList(AllInformationAboutUserType),
+            resolve: async () => {
+              const users = await this.db.users.findMany();
+              const allUsersData = [];
+              for (let i = 0; i < users.length; i++) {
+                const posts = await this.db.posts.findMany({
+                  key: 'userId',
+                  equals: users[i].id,
+                });
+                const profile = await this.db.profiles.findOne({
+                  key: 'userId',
+                  equals: users[i].id,
+                });
+                const memberType = profile
+                  ? await this.db.memberTypes.findOne({
+                      key: 'id',
+                      equals: profile.memberTypeId,
+                    })
+                  : null;
+                allUsersData.push({
+                  user: users[i],
+                  profile,
+                  memberType,
+                  posts,
+                });
+              }
+              return allUsersData;
+            },
+          },
         },
       });
       const schema = new GraphQLSchema({

@@ -37,7 +37,7 @@ export const ProfileType = new GraphQLObjectType({
     id: { type: GraphQLID },
     avatar: { type: GraphQLString },
     sex: { type: GraphQLString },
-    birthday: { type: GraphQLString },
+    birthday: { type: GraphQLInt },
     country: { type: GraphQLString },
     street: { type: GraphQLString },
     city: { type: GraphQLString },
@@ -45,3 +45,13 @@ export const ProfileType = new GraphQLObjectType({
     userId: { type: GraphQLID },
   }),
 });
+
+export const AllInformationAboutUserType = new GraphQLObjectType({
+  name: 'allInformationAboutUserType',
+  fields: () => ({
+    user: {type: UserType},
+    profile: {type: ProfileType},
+    memberType: {type: MemberTypeType},
+    posts: {type: new GraphQLList(PostType)}
+  })
+})

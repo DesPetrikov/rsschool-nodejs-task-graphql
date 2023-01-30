@@ -58,8 +58,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.params.id,
       });
       if (!deletedUser) {
-        reply.statusCode = 400;
-        throw new Error('Invalid id');
+
+        throw this.httpErrors.badRequest('Invalid id');
       }
       const subscriptions = await this.db.users.findMany({
         key: 'subscribedToUserIds',
@@ -109,12 +109,10 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.body.userId,
       });
       if (!subscriber) {
-        reply.statusCode = 400;
-        throw new Error('Invalid subscriber id');
+        throw this.httpErrors.badRequest('Invalid subscriber id');
       }
       if (!subscriptionKeeper) {
-        reply.statusCode = 400;
-        throw new Error('Invalid subscriptionKeeper id');
+        throw this.httpErrors.badRequest('Invalid subscriptionKeeper id');
       }
       return await this.db.users.change(subscriptionKeeper.id, {
         subscribedToUserIds: [
@@ -143,12 +141,10 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.body.userId,
       });
       if (!subscriber) {
-        reply.statusCode = 400;
-        throw new Error('Invalid subscriber id');
+        throw this.httpErrors.badRequest('Invalid subscriber id');
       }
       if (!subscriptionKeeper) {
-        reply.statusCode = 400;
-        throw new Error('Invalid subscriptionKeeper id');
+        throw this.httpErrors.badRequest('Invalid subscriptionKeeper id');
       }
       const subscriberIdx = subscriptionKeeper.subscribedToUserIds.findIndex(
         (subId) => subId === subscriber.id
@@ -160,8 +156,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
           ),
         });
       } else {
-        reply.statusCode = 400;
-        throw new Error('Following user not found');
+
+        throw this.httpErrors.badRequest('Following user not found');
       }
     }
   );

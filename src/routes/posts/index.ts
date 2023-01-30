@@ -54,8 +54,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.params.id,
       });
       if (!deletedPost) {
-        reply.statusCode = 400;
-        throw new Error('Invalid id');
+        throw this.httpErrors.badRequest('Invalid id');
       }
       await this.db.posts.delete(request.params.id);
       return deletedPost;
@@ -76,8 +75,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.params.id,
       });
       if (!post) {
-        reply.statusCode = 400;
-        throw new Error('Invalid id');
+        throw this.httpErrors.badRequest('Invalid id');
       }
       return await this.db.posts.change(request.params.id, request.body);
     }
