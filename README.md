@@ -74,3 +74,68 @@ If you have chosen a non-default gql environment, then the connection of some fu
 Limit the complexity of the graphql queries by their depth with "graphql-depth-limit" package.  
 E.g. User can refer to other users via properties `userSubscribedTo`, `subscribedToUser` and users within them can also have `userSubscribedTo`, `subscribedToUser` and so on.  
 Your task is to add a new rule (created by "graphql-depth-limit") in [validation](https://graphql.org/graphql-js/validation/) to limit such nesting to (for example) 6 levels max.
+
+## GQL query samples
+* for task 2.1
+```query QueryOne{
+  users {
+    id
+    firstName
+    lastName
+    email
+    subscribedToUserIds
+  }
+  posts{
+    id
+    title
+  }
+  memberTypes {
+    id
+    discount
+  }
+  profiles {
+    id
+    avatar
+  }
+}
+```
+
+* for task 2.2
+```
+query MyQuery($userId: ID!, $profileId: ID!, $postId: ID!, $memberTypeId: ID!) {
+   user(userId: $userId) {
+       firstName
+   }
+   post(postId: $postId) {
+       id
+   }
+   memberType(memberTypeId: $memberTypeId) {
+       monthPostsLimit
+   }
+   profile(profileId: $profileId) {
+       street
+       city
+   }
+}
+```
+
+* for task 2.3
+```
+query MyQuery {
+    allInformationAboutUsers {
+    user {
+      firstName
+    }
+    profile {
+      sex
+      street
+    }
+    memberType {
+      monthPostsLimit
+    }
+    posts {
+      content
+    }
+    }
+}
+```
