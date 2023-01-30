@@ -23,8 +23,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         equals: request.params.id,
       });
       if (!post) {
-        reply.statusCode = 404;
-        throw new Error('Invalid id');
+        throw this.httpErrors.notFound(`Post with id - ${request.params.id} not found`)
       }
       return post;
     }
